@@ -20,6 +20,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'ancestry', '>= 0', '>= 0'
 
   s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'ancestry', '>= 0', '>= 0'
-  # s.add_development_dependency 'test-unit'
+  # s.add_development_dependency 'ancestry', '>= 0', '>= 0'
+  spec.add_development_dependency 'bundler', '~> 1.7'
+  spec.add_development_dependency 'rake', '~> 10.0'
+  s.add_development_dependency 'test-unit'
 end
