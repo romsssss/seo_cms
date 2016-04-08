@@ -1,0 +1,12 @@
+
+<%= content_for :title, "#{@article.title} | LiveMentor" %>
+
+<%= content_for :head do %>
+  <meta name="description" content="<%= @article.metadata %>"/>
+<% end %>
+
+<div class="breadcrumbs">
+  <%= generate_breadcrumbs(@article.breadcrumbs_info) %>
+</div>
+
+<%= @article.content.html_safe %>

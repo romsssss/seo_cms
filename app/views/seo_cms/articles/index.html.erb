@@ -1,0 +1,19 @@
+<h1>Articles SEO (<%= @articles.size %>)</h1>
+
+<table style="width:100%">
+<% @articles.each do |article| %>
+  <tr>
+    <td><%= article.url %></td>
+    <td><%= generate_breadcrumbs(article.breadcrumbs_info) %></td>
+    <td>
+        <%= link_to 'Voir', article.url %>
+        | <%= link_to 'Modifier', edit_article_path(article) %>
+        | <%= link_to 'Supprimer', article, method: :delete, data: { confirm: "T'es sur meuf/mec ? " } %>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'Nouvel article', new_article_path %>

@@ -1,0 +1,66 @@
+<%= content_for :head do %>
+  <%#= stylesheet_link_tag    "seo_cms/redator", :media => "all" %>
+  <%#= javascript_include_tag "seo_cms/redacto.min" %>
+<% end %>
+
+<%= form_for(@article) do |f| %>
+  <% if @article.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@article.errors.count, "error") %> prohibited this article from being saved:</h2>
+
+      <ul>
+      <% @article.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </div>
+
+  <div class="field">
+    <%= f.label :breadcrumb_title %><br />
+    <%= f.text_field :breadcrumb_title %>
+    <%= "(breadcrumbs actuel: #{generate_breadcrumbs(@article.breadcrumbs_info)})".html_safe unless @article.breadcrumbs_info.empty? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :uri %><br />
+    <%= f.text_field :uri %>
+    <%= "(url actuelle: #{@article.url})".html_safe %>
+  </div>
+
+  <div class="field">
+   <%= f.label :parent %><br />
+   <%= f.select :parent_id, @parents %>
+  </div>
+
+<!--   <div class="field">
+    <%= f.label :is_placeholder %><br />
+    <%= f.check_box :is_placeholder %>
+  </div> -->
+
+  <div class="field">
+    <%= f.label :metadata %><br />
+    <%= f.text_area :metadata, cols: 60, rows: 8 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :content %><br />
+    <%= f.text_area :content, id: "seo_article_content" %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+$(function() {
+  $('#seo_article_content').redactor();
+});
+</script>
+

@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  title: MyString
+  metadata: MyText
+  content: MyText
+  breadcrumb_title: MyString
+  uri: MyString
+  is_placeholder: false
+
+two:
+  title: MyString
+  metadata: MyText
+  content: MyText
+  breadcrumb_title: MyString
+  uri: MyString
+  is_placeholder: false
