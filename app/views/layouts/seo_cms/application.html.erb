@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SeoCms</title>
+  <title>SEO CMS</title>
   <%= stylesheet_link_tag    "seo_cms/application", :media => "all" %>
   <%= javascript_include_tag "seo_cms/application" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+
+<% flash.each do |name, msg| %>
+  <% if msg.is_a?(String) %>
+    <%= content_tag :div, msg, :class => "flash_#{name}" %>
+  <% end %>
+<% end %>
 
 <%= yield %>
 

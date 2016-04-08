@@ -4,7 +4,6 @@ module SeoCms
   class DynamicRouter
     class << self
       def load
-        return unless defined?(SeoCms::Article)
         return unless ActiveRecord::Base.connection.table_exists? 'seo_cms_articles'
 
         SeoCms::Engine.routes.draw do
