@@ -1,17 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
-one:
-  title: MyString
-  metadata: MyText
-  content: MyText
-  breadcrumb_title: MyString
-  uri: MyString
+ninja_turtles:
+  title: 'Ninja Turtles Blog'
+  uri: 'ninja-turtles'
+  breadcrumb_title: 'Ninja Turtles'
+  metadata: 'ninja trurtle'
+  content: '<h1>Why Ninja Turtles are the best</h1>'
   is_placeholder: false
 
-two:
-  title: MyString
-  metadata: MyText
-  content: MyText
-  breadcrumb_title: MyString
-  uri: MyString
+michaelangelo:
+  title: 'Michaelangelo page'
+  uri: 'michaelangelo'
+  breadcrumb_title: 'Michaelangelo'
+  metadata: 'michaelangelo nunchucks orange'
+  content: '<h1>Michaelangelo: a free-spirit</h1>'
   is_placeholder: false
