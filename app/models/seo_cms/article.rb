@@ -1,15 +1,6 @@
-class Rails::Engine
-  def self.mounted_path
-    route = Rails.application.routes.routes.detect do |route|
-      route.app == self
-    end
-    route && route.path
-  end
-end
-
 module SeoCms
   class Article < ActiveRecord::Base
-    attr_accessible :breadcrumb_title, :content, :is_placeholder, :metadata, :title, :uri, :parent_id
+    attr_accessible :breadcrumb_title, :content, :is_placeholder, :metadata, :title, :uri
 
     has_ancestry orphan_strategy: :adopt
 
@@ -19,18 +10,17 @@ module SeoCms
     after_save :reload_routes
 
     def url(include_mount_endpoint = true)
-      if include_mount_endpoint && SeoCms::Engine.mounted_path.spec.to_s != '/'
-        SeoCms::Engine.mounted_path.spec.to_s + '/' + ancestors.map(&:uri).push(uri).join('/')
-      else
-        '/' + ancestors.map(&:uri).push(uri).join('/')
-      end
+      mounted_on = SeoCms::Engine.mounted_path.spec.to_s
+      path = '/' + ancestors.map(&:uri).push(uri).join('/')
+      path = mounted_on + path if include_mount_endpoint &&  mounted_on != '/'
+      path
     end
 
     def breadcrumbs_info
-      ancestors.map(&:breadrcumb_info).push(breadrcumb_info)
+      ancestors.map(&:breadcrumb_info).push(breadcrumb_info)
     end
 
-    def breadrcumb_info
+    def breadcrumb_info
       {
         label: breadcrumb_title,
         url: url
