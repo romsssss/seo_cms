@@ -51,5 +51,15 @@ module SeoCms
       assert_equal(@michaelangelo.breadcrumbs_info.size, 2)
     end
 
+    # find_by_url
+    test 'find_by_url returns nil when no article exists' do
+      assert_nil(Article.find_by_url('/not/existing'))
+    end
+    test 'returns the right article' do
+      result = Article.find_by_url('/ninja-turtles')
+      assert_kind_of(Article, result)
+      assert_equal(result, @ninja_turtles)
+    end
+
   end
 end

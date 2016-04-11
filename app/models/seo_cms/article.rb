@@ -9,6 +9,12 @@ module SeoCms
 
     after_save :reload_routes
 
+    class << self
+      def find_by_url(url)
+        self.all.find { |article| [article.url(true), article.url(false)].include?(url) }
+      end
+    end
+
     def url(include_mount_endpoint = true)
       mounted_on = SeoCms::Engine.mounted_path.spec.to_s
       path = '/' + ancestors.map(&:uri).push(uri).join('/')
