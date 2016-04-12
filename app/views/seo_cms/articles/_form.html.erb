@@ -1,8 +1,3 @@
-<%= content_for :head do %>
-  <%#= stylesheet_link_tag    "seo_cms/redator", :media => "all" %>
-  <%#= javascript_include_tag "seo_cms/redacto.min" %>
-<% end %>
-
 <%= form_for(@article) do |f| %>
   <% if @article.errors.any? %>
     <div id="error_explanation">

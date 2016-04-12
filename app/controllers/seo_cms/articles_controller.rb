@@ -88,6 +88,7 @@ module SeoCms
 
     private
 
+    # https://github.com/stefankroes/ancestry/wiki/Creating-a-selectbox-for-a-form-using-ancestry
     def retrieve_parents
       @parents = Article.all.each { |c| c.ancestry = c.ancestry.to_s + (!c.ancestry.nil? ? '/' : '') + c.id.to_s
             }.sort { |x, y| x.ancestry <=> y.ancestry
