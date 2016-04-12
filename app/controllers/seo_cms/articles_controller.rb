@@ -3,6 +3,7 @@ require_dependency "seo_cms/application_controller"
 module SeoCms
   class ArticlesController < ApplicationController
     before_filter :retrieve_parents, only: [:new, :edit, :create, :update]
+    before_filter :title_suffix, only: [:new, :edit, :create, :update]
 
     layout SeoCms.layout, only: [:show]
 
@@ -94,6 +95,10 @@ module SeoCms
             }.sort { |x, y| x.ancestry <=> y.ancestry
             }.map { |c| ['-' * (c.depth - 1) + c.url, c.id]
             }.unshift(['-- none --', nil])
+    end
+
+    def title_suffix
+      @title_suffix = SeoCms.title_suffix
     end
   end
 end

@@ -36,6 +36,8 @@ SeoCms.setup do |config|
   config.layout = 'layouts/my_custom_layout' # default value is 'layouts/application'
   # SEO tree orphan strategy used by ancestry gem (https://github.com/stefankroes/ancestry)
   config.orphan_startegy =  :destroy # default value is :adopt
+  # Suffix to append to the page title ("my title | suffix")
+  config.suffix_title = 'MyProject' # defauly is nil
 end
 ```
 

@@ -13,7 +13,10 @@
 
   <div class="form-group" id="title-form-group">
     <%= f.label :title, class: 'control-label' %>
-    <%= f.text_field :title, class: 'form-control', id: 'title-input' %>
+    <div class="form-inline">
+      <%= f.text_field :title, class: 'form-control', id: 'title-input' %>
+      <%= "| #{@title_suffix}" unless @title_suffix.nil? %>
+    </div>
   </div>
 
   <div class="form-group">
@@ -59,6 +62,11 @@
 
 <script type="text/javascript">
 $(function() {
+
+  <% unless @title_suffix.nil? %>
+    var title_suffix = '<%= @title_suffix %>';
+  <% end %>
+
   $('#seo_article_content').redactor();
 
 
@@ -70,6 +78,9 @@ $(function() {
 
   function check_title_length() {
     var title_content = $("#title-input").val();
+    if (typeof title_suffix !== 'undefined') {
+      title_content = title_content.concat(' | ').concat(title_suffix);
+    }
     if(title_content.length > 65) {
       addWarningMessage($("#title-form-group"), "Un titre de plus de 65 caractères peut être cropé par les moteurs de recherche.");
     } else {

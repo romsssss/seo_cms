@@ -4,6 +4,7 @@ class SeoCmsTest < ActiveSupport::TestCase
   setup do
     @default_layout = SeoCms.layout
     @default_orphan_strategy = SeoCms.orphan_strategy
+    @default_title_suffix = SeoCms.title_suffix
   end
 
   test 'is a module' do
@@ -39,6 +40,19 @@ class SeoCmsTest < ActiveSupport::TestCase
     SeoCms.orphan_strategy = :destroy
     assert_equal(SeoCms.orphan_strategy, :destroy)
     SeoCms.orphan_strategy = @default_orphan_strategy
+  end
+
+  # title_suffix option
+  test 'has a title_suffix option' do
+    assert_respond_to(SeoCms, :title_suffix)
+  end
+  test 'title_suffix option default to nil' do
+    assert_nil(SeoCms.title_suffix)
+  end
+  test 'title_suffix option can be overwritten' do
+    SeoCms.title_suffix = 'woot'
+    assert_equal(SeoCms.title_suffix, 'woot')
+    SeoCms.title_suffix = @default_title_suffix
   end
 
   test 'options can be set all at once' do

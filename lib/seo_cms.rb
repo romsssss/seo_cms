@@ -5,6 +5,7 @@ require 'seo_cms/dynamic_router'
 module SeoCms
   mattr_accessor :layout
   mattr_accessor :orphan_strategy
+  mattr_accessor :title_suffix
 
   class << self
     def layout
