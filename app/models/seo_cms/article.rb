@@ -1,6 +1,6 @@
 module SeoCms
   class Article < ActiveRecord::Base
-    attr_accessible :breadcrumb_title, :content, :is_placeholder, :metadata, :title, :uri
+    attr_accessible :breadcrumb_title, :content, :is_placeholder, :metadata, :title, :uri, :parent_id
 
     has_ancestry orphan_strategy: SeoCms.orphan_strategy
 

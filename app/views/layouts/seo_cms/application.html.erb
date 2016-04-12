@@ -8,13 +8,33 @@
 </head>
 <body>
 
-<% flash.each do |name, msg| %>
-  <% if msg.is_a?(String) %>
-    <%= content_tag :div, msg, :class => "flash_#{name}" %>
-  <% end %>
-<% end %>
+  <!-- Navbar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <%= link_to 'SEO CMS', SeoCms::Engine.mounted_path.spec.to_s + '/seo_content', class: 'navbar-brand' %>
+      </div>
 
-<%= yield %>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <%= yield :navbar_right %>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash messages -->
+  <% flash.each do |type, message| %>
+    <div class="alert <%= bootstrap_class_for(type) %> fade in">
+      <button class="close" data-dismiss="alert">×</button>
+      <%= message %>
+    </div>
+  <% end %>
+
+  <!-- Main content -->
+  <div class="container-fluid">
+    <%= yield %>
+  </div>
 
 </body>
 </html>

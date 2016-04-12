@@ -11,40 +11,44 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :title %><br />
-    <%= f.text_field :title %>
+  <div class="form-group">
+    <%= f.label :title %>
+    <%= f.text_field :title, class: 'form-control' %>
   </div>
 
-  <div class="field">
-    <%= f.label :breadcrumb_title %><br />
-    <%= f.text_field :breadcrumb_title %>
-    <%= "(breadcrumbs actuel: #{generate_breadcrumbs(@article.breadcrumbs_info)})".html_safe unless @article.breadcrumbs_info.empty? %>
+  <div class="form-group">
+    <%= f.label :breadcrumb_title %>
+    <%= f.text_field :breadcrumb_title, class: 'form-control' %>
+    <span id="helpBlock" class="help-block">
+      <%= "breadcrumbs actuel: #{generate_breadcrumbs(@article.breadcrumbs_info)}".html_safe %>
+    </span>
   </div>
 
-  <div class="field">
-    <%= f.label :uri %><br />
-    <%= f.text_field :uri %>
-    <%= "(url actuelle: #{@article.url})".html_safe %>
+  <div class="form-group">
+    <%= f.label :uri %>
+    <%= f.text_field :uri, class: 'form-control' %>
+    <span id="helpBlock" class="help-block">
+      <%= "url actuelle: #{@article.url}".html_safe %>
+    </span>
   </div>
 
-  <div class="field">
-   <%= f.label :parent %><br />
-   <%= f.select :parent_id, @parents %>
+  <div class="form-group">
+   <%= f.label :parent %>
+   <%= f.select :parent_id, @parents, {}, { class: 'form-control' } %>
   </div>
 
-<!--   <div class="field">
+<!--   <div class="form-group">
     <%= f.label :is_placeholder %><br />
     <%= f.check_box :is_placeholder %>
   </div> -->
 
-  <div class="field">
-    <%= f.label :metadata %><br />
-    <%= f.text_area :metadata, cols: 60, rows: 8 %>
+  <div class="form-group">
+    <%= f.label :metadata, 'Decription metadata' %>
+    <%= f.text_area :metadata, rows: 3, class: 'form-control' %>
   </div>
 
-  <div class="field">
-    <%= f.label :content %><br />
+  <div class="form-group">
+    <%= f.label :content %>
     <%= f.text_area :content, id: "seo_article_content" %>
   </div>
 
