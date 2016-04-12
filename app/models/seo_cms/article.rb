@@ -16,9 +16,9 @@ module SeoCms
     end
 
     def url(include_mount_endpoint = true)
-      mounted_on = SeoCms::Engine.mounted_path.spec.to_s
+      mounted_on = SeoCms::Engine.mounted_path.try(:spec).try(:to_s)
       path = '/' + ancestors.map(&:uri).push(uri).join('/')
-      path = mounted_on + path if include_mount_endpoint &&  mounted_on != '/'
+      path = mounted_on + path if include_mount_endpoint &&  mounted_on && mounted_on != '/'
       path
     end
 

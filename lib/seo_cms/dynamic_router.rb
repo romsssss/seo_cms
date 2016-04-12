@@ -8,7 +8,7 @@ module SeoCms
 
         SeoCms::Engine.routes.draw do
           SeoCms::Article.all.each do |article|
-            puts "routing #{article.url}"
+            # puts "routing #{article.url}"
             get article.url(false), to: 'articles#show', defaults: { id: article.id }
           end
         end

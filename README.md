@@ -25,7 +25,7 @@ mount SeoCms::Engine, at: "/"
 rails s
 ```
 
-Start adding content using the following link: http://127.0.0.1:3000/seso_content
+Start adding content using the following link: http://127.0.0.1:3000/seo_content
 
 ## Configure
 
@@ -35,9 +35,9 @@ SeoCms.setup do |config|
   # layout used to render SEO pages
   config.layout = 'layouts/my_custom_layout' # default value is 'layouts/application'
   # SEO tree orphan strategy used by ancestry gem (https://github.com/stefankroes/ancestry)
-  config.orphan_startegy =  :destroy # default value is :adopt
+  config.orphan_strategy =  :destroy # default value is :adopt
   # Suffix to append to the page title ("my title | suffix")
-  config.suffix_title = 'MyProject' # defauly is nil
+  config.title_suffix = 'MyProject' # default is nil
 end
 ```
 
