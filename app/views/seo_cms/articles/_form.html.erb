@@ -1,7 +1,7 @@
 <%= form_for(@article) do |f| %>
   <% if @article.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@article.errors.count, "error") %> prohibited this article from being saved:</h2>
+      <h4><%= pluralize(@article.errors.count, "error") %> prohibited this article from being saved:</h4>
 
       <ul>
       <% @article.errors.full_messages.each do |msg| %>
@@ -11,9 +11,9 @@
     </div>
   <% end %>
 
-  <div class="form-group">
-    <%= f.label :title %>
-    <%= f.text_field :title, class: 'form-control' %>
+  <div class="form-group" id="title-form-group">
+    <%= f.label :title, class: 'control-label' %>
+    <%= f.text_field :title, class: 'form-control', id: 'title-input' %>
   </div>
 
   <div class="form-group">
@@ -42,9 +42,9 @@
     <%= f.check_box :is_placeholder %>
   </div> -->
 
-  <div class="form-group">
-    <%= f.label :metadata, 'Decription metadata' %>
-    <%= f.text_area :metadata, rows: 3, class: 'form-control' %>
+  <div class="form-group" id="metadata-form-group">
+    <%= f.label :metadata, 'Decription metadata', class: 'control-label' %>
+    <%= f.text_area :metadata, rows: 3, class: 'form-control', id: "metadata-input" %>
   </div>
 
   <div class="form-group">
@@ -60,6 +60,46 @@
 <script type="text/javascript">
 $(function() {
   $('#seo_article_content').redactor();
+
+
+  // Lengths validations
+  check_title_length();
+  check_metadata_length();
+  $("#title-input").keyup(check_title_length);
+  $("#metadata-input").keyup(check_metadata_length);
+
+  function check_title_length() {
+    var title_content = $("#title-input").val();
+    if(title_content.length > 65) {
+      addWarningMessage($("#title-form-group"), "Un titre de plus de 65 caractères peut être cropé par les moteurs de recherche.");
+    } else {
+      removeWarningMessage($("#title-form-group"));
+    }
+  }
+
+  function check_metadata_length() {
+    var metadata_content = $("#metadata-input").val();
+    if(metadata_content.length > 156) {
+      console.debug('rred');
+      addWarningMessage($("#metadata-form-group"), "Une description metadata de plus de 156 caractères peut être cropé par les moteurs de recherche.");
+    } else {
+      console.debug('green');
+      removeWarningMessage($("#metadata-form-group"));
+    }
+  }
+
+  function addWarningMessage(element, text) {
+    if (!element.hasClass('has-warning')) {
+      element.addClass('has-warning');
+      element.append("<span class='help-block'>" + text +  "</span>");
+    }
+  }
+
+  function removeWarningMessage(element) {
+    element.removeClass('has-warning');
+    element.find('.help-block').remove();
+  }
+
 });
 </script>
 
