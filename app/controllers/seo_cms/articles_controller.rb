@@ -81,7 +81,7 @@ module SeoCms
       @article.destroy
 
       respond_to do |format|
-        format.html { redirect_to articles_url }
+        format.html { redirect_to articles_url, notice: 'Article supprimé.' }
         format.json { head :no_content }
       end
     end

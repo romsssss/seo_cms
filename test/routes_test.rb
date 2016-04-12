@@ -21,4 +21,8 @@ class RoutesTest < ActionController::TestCase
     )
   end
 
+  # test "should not show article (articles routes are auto generated)" do
+  #   assert_raise(ActionController::RoutingError) { get :show, id: @article }
+  # end
+
 end

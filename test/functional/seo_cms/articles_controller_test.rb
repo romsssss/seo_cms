@@ -16,6 +16,7 @@ module SeoCms
     test "should get new" do
       get :new
       assert_response :success
+      assert_not_nil assigns(:article)
       assert_not_nil assigns(:parents)
     end
 
@@ -40,8 +41,9 @@ module SeoCms
 
     test "should get edit" do
       get :edit, id: @article
-      assert_not_nil assigns(:parents)
       assert_response :success
+      assert_not_nil assigns(:article)
+      assert_not_nil assigns(:parents)
     end
 
     test "should update article" do
