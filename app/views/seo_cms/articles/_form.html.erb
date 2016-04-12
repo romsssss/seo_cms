@@ -67,14 +67,21 @@ $(function() {
     var title_suffix = '<%= @title_suffix %>';
   <% end %>
 
-  $('#seo_article_content').redactor();
-
+  // redactor
+  launch_redactor();
 
   // Lengths validations
   check_title_length();
   check_metadata_length();
   $("#title-input").keyup(check_title_length);
   $("#metadata-input").keyup(check_metadata_length);
+
+
+  function launch_redactor() {
+    $('#seo_article_content').redactor({
+      plugins: ['table']
+    });
+  }
 
   function check_title_length() {
     var title_content = $("#title-input").val();
