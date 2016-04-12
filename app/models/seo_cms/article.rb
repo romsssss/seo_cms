@@ -2,7 +2,7 @@ module SeoCms
   class Article < ActiveRecord::Base
     attr_accessible :breadcrumb_title, :content, :is_placeholder, :metadata, :title, :uri
 
-    has_ancestry orphan_strategy: :adopt
+    has_ancestry orphan_strategy: SeoCms.orphan_strategy
 
     validates :uri, uniqueness: true, presence: true
     validate :uniq_url, on: :create

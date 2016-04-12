@@ -4,7 +4,7 @@ module SeoCms
   class ArticlesController < ApplicationController
     before_filter :retrieve_parents, only: [:new, :edit, :create, :update]
 
-    layout 'layouts/application', only: [:show]
+    layout SeoCms.layout, only: [:show]
 
     # GET /articles
     # GET /articles.json
@@ -21,7 +21,6 @@ module SeoCms
     # GET /articles/1.json
     def show
       @article = Article.find(params[:id])
-
       respond_to do |format|
         format.html # show.html.erb
         format.json { render json: @article }
