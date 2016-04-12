@@ -14,5 +14,13 @@ module SeoCms
           flash_type.to_s
       end
     end
+
+    def generate_title(article)
+      if SeoCms.title_suffix.nil?
+        article.title
+      else
+        "#{article.title} | #{SeoCms.title_suffix}"
+      end
+    end
   end
 end

@@ -1,5 +1,4 @@
-
-<%= content_for :title, "#{@article.title} | LiveMentor" %>
+<%= content_for :title, generate_title(@article) %>
 
 <%= content_for :head do %>
   <meta name="description" content="<%= @article.metadata %>"/>

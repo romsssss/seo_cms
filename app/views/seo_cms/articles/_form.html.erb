@@ -91,10 +91,8 @@ $(function() {
   function check_metadata_length() {
     var metadata_content = $("#metadata-input").val();
     if(metadata_content.length > 156) {
-      console.debug('rred');
       addWarningMessage($("#metadata-form-group"), "Une description metadata de plus de 156 caractères peut être cropé par les moteurs de recherche.");
     } else {
-      console.debug('green');
       removeWarningMessage($("#metadata-form-group"));
     }
   }
