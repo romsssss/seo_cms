@@ -30,7 +30,7 @@ class NavigationTest < ActionDispatch::IntegrationTest
     post "/seo_cms/seo_content", article: {
       breadcrumb_title: @article.breadcrumb_title,
       content: @article.content,
-      is_placeholder: @article.is_placeholder,
+      is_draft: @article.is_draft,
       metadata: @article.metadata,
       title: @article.title,
       uri: "#{@article.uri}#{Time.now.to_i}"

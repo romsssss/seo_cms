@@ -22,5 +22,18 @@ module SeoCms
         "#{article.title} | #{SeoCms.title_suffix}"
       end
     end
+
+    def orphan_startegy_description
+      case SeoCms.orphan_strategy
+      when :destroy
+        'all children will be destroyed'
+      when :rootify
+        'children node will become root nodes'
+      when :restrict
+        'cannot delete node if any children exist'
+      when :adopt
+        'orphan subtree will be added to the parent of the deleted node. If the deleted node is Root, then it will rootify the orphan subtree'
+      end
+    end
   end
 end

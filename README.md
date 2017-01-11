@@ -5,7 +5,7 @@ SeoCms is a simple CMS dedicated to SEO content. It allows simple management of 
 ## Setup
 
 ```
-gem 'seo_cms', git: 'https://github.com/romsssss/seo_cms.git'
+gem 'seo_cms', path: 'vendor/seo_cms'
 ```
 
 ```
@@ -35,9 +35,12 @@ SeoCms.setup do |config|
   # layout used to render SEO pages
   config.layout = 'layouts/my_custom_layout' # default value is 'layouts/application'
   # SEO tree orphan strategy used by ancestry gem (https://github.com/stefankroes/ancestry)
-  config.orphan_strategy =  :destroy # default value is :adopt
+  config.orphan_strategy = :destroy # default value is :adopt
   # Suffix to append to the page title ("my title | suffix")
   config.title_suffix = 'MyProject' # default is nil
+  # Routes reloading startegy: whether or not the routes are reloaded on the fly whenever a new
+  # article is created or edited
+  config.reload_routes_on_the_fly = false # default is true
 end
 ```
 

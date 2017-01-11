@@ -1,8 +1,11 @@
 <%= content_for :title, generate_title(@article) %>
 
 <%= content_for :head do %>
+  <%= canonical_tag path: @article.cached_url %>
   <meta name="description" content="<%= @article.metadata %>"/>
 <% end %>
+
+<% content_for :body_class, "roboto" %>
 
 <div class="breadcrumbs">
   <%= generate_breadcrumbs(@article.breadcrumbs_info) %>

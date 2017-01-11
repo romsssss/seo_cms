@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160407145900) do
+ActiveRecord::Schema.define(:version => 20160607081846) do
 
   create_table "seo_cms_articles", :force => true do |t|
     t.string   "title"
@@ -19,12 +19,15 @@ ActiveRecord::Schema.define(:version => 20160407145900) do
     t.text     "content"
     t.string   "breadcrumb_title"
     t.string   "uri"
-    t.boolean  "is_placeholder"
+    t.boolean  "is_draft",         :default => true
     t.string   "ancestry"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+    t.string   "cached_url",                         :null => false
+    t.boolean  "is_placeholder",   :default => true, :null => false
   end
 
   add_index "seo_cms_articles", ["ancestry"], :name => "index_seo_cms_articles_on_ancestry"
+  add_index "seo_cms_articles", ["cached_url"], :name => "index_seo_cms_articles_on_cached_url"
 
 end

@@ -8,18 +8,33 @@
 
 <div class="table-responsive">
   <table class="table table-condensed table-hover">
-  <% @articles.each do |article| %>
+  <% @articles.sort_by{|a| a.is_draft ? 1 : 0 }.each do |article| %>
     <tr>
       <td><%= article.url %></td>
       <td><%= generate_breadcrumbs(article.breadcrumbs_info) %></td>
-      <td>
-          <%= link_to 'Voir', article.url %>
-          | <%= link_to 'Modifier', edit_article_path(article) %>
-          | <%= link_to 'Supprimer', article, method: :delete, data: { confirm: "T'es sur meuf/mec ? " } %>
+      <td class="status-labels">
+        <%= status_labels(article).html_safe %>
+      </td>
+      <td class="action-links">
+
+
+          <%= link_to edit_article_path(article) do %>
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+          <% end %>
+          | <%= link_to article, method: :delete, data: { confirm: "Are you sure ? #{orphan_startegy_description}" } do %>
+              <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+            <% end %>
+        <% if article.is_draft %>
+          | <%= link_to preview_article_path(article), target: '_blank' do %>
+              <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+            <% end %>
+        <% else %>
+          | <%= link_to article.url, target: '_blank' do %>
+              <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+            <% end %>
+        <% end %>
       </td>
     </tr>
   <% end %>
   </table>
 </div>
-
-

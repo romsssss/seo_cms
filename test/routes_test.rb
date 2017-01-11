@@ -3,7 +3,9 @@ require 'test_helper'
 class RoutesTest < ActionController::TestCase
 
   setup do
-    @article = seo_cms_articles(:michaelangelo)
+    article_attributes = seo_cms_articles(:michaelangelo).attributes.reject { |k| %w(id ancestry created_at updated_at cached_url).include?(k) }
+    article_attributes['uri'] = article_attributes['uri'] + Time.now.to_i.to_s
+    @article = SeoCms::Article.create(article_attributes)
     @routes = SeoCms::Engine.routes
   end
 
@@ -21,8 +23,10 @@ class RoutesTest < ActionController::TestCase
     )
   end
 
-  # test "should not show article (articles routes are auto generated)" do
-  #   assert_raise(ActionController::RoutingError) { get :show, id: @article }
-  # end
+  test "should not show article (articles routes are auto generated)" do
+    assert_raises(ActionController::RoutingError) do
+      assert_recognizes({}, "/seo_cms/articles/#{@article.id}")
+    end
+  end
 
 end

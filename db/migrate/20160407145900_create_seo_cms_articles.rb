@@ -6,7 +6,7 @@ class CreateSeoCmsArticles < ActiveRecord::Migration
       t.text :content
       t.string :breadcrumb_title
       t.string :uri
-      t.boolean :is_placeholder
+      t.boolean :is_draft
       t.string :ancestry
 
       t.timestamps

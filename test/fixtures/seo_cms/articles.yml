@@ -6,7 +6,9 @@ ninja_turtles:
   breadcrumb_title: 'Ninja Turtles'
   metadata: 'ninja trurtle'
   content: '<h1>Why Ninja Turtles are the best</h1>'
+  is_draft: false
   is_placeholder: false
+  cached_url: 'dummy-cached-url'
 
 michaelangelo:
   title: 'Michaelangelo page'
@@ -14,4 +16,16 @@ michaelangelo:
   breadcrumb_title: 'Michaelangelo'
   metadata: 'michaelangelo nunchucks orange'
   content: '<h1>Michaelangelo: a free-spirit</h1>'
+  is_draft: false
   is_placeholder: false
+  cached_url: 'dummy-cached-url'
+
+leonardo:
+  title: 'Leonardo page'
+  uri: 'leonardo'
+  breadcrumb_title: 'Leonardo'
+  metadata: 'leonardo ninjato blue'
+  content: '<h1>Leonardo: the most disciplined</h1>'
+  is_draft: false
+  is_placeholder: false
+  cached_url: 'dummy-cached-url'

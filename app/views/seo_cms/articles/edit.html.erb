@@ -1,5 +1,55 @@
+<%= content_for :navbar_right do %>
+  <li class="article_status">
+    <%= status_labels(@article).html_safe %>
+  </li>
+  <li>
+    <%= link_to 'Retour', articles_path, id: 'back_link' %>
+  </li>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#" id="edit_article_submit">Enregistrer</a></li>
+      <% if @article.is_draft %>
+        <li><a href="#" id="publish_article">Publier</a></li>
+      <% else %>
+        <li><a href="#" id="draft_article">Passer en mode brouillon</a></li>
+      <% end %>
+      <li role="separator" class="divider"></li>
+      <li><%= link_to 'Supprimer', @article, method: :delete, data: { confirm: "Are you sure ? #{orphan_startegy_description}" } %></li>
+    </ul>
+  </li>
+<% end %>
+
 <h3>Modifier article SEO</h3>
 
-<%= render 'form' %>
+<%= render partial: 'form', locals: { form_id: "edit_article_#{@article.id}", show_submit_button: false } %>
 
-<%= link_to 'Retour', articles_path %>
+<script type="text/javascript">
+$(function() {
+  var form_id = "#edit_article_<%= @article.id %>";
+
+  $('#edit_article_submit').click(submit_form); // enregistrer
+  $('#publish_article').click(publish_article); // publier
+  $('#draft_article').click(save_article_as_draft); // passer en mode brouillon
+
+  function publish_article() {
+    if (!confirm('Publier cet article le rendra visible en production')) {
+      return false;
+    }
+    $('#article_is_draft').val('f');
+    submit_form();
+  }
+
+  function save_article_as_draft() {
+    if (!confirm('Passer cet article en mode brouillon le rendra invisible en production')) {
+      return false;
+    }
+    $('#article_is_draft').val('t');
+    submit_form();
+  }
+
+  function submit_form() {
+    $(form_id).submit();
+  }
+});
+</script>

@@ -1,5 +1,22 @@
+<%= content_for :navbar_right do %>
+  <li>
+    <%= link_to 'Retour', articles_path %>
+  </li>
+  <li>
+    <form class="navbar-form">
+      <button type="button" class="btn btn-default" id="create_article_submit">Créer comme brouillon</button>
+    </form>
+  </li>
+<% end %>
+
 <h3>Nouvel SEO article</h3>
 
-<%= render 'form' %>
+<%= render partial: 'form', locals: { form_id: "new_article", show_submit_button: false } %>
 
-<%= link_to 'Retour', articles_path %>
+<script type="text/javascript">
+$(function() {
+  $('#create_article_submit').on('click', function() {
+    $('#new_article').submit();
+  });
+});
+</script>

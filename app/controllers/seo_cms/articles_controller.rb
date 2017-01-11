@@ -2,10 +2,13 @@ require_dependency "seo_cms/application_controller"
 
 module SeoCms
   class ArticlesController < ApplicationController
+    include ArticlesHelper # use of generate_breadcrumbs
+    before_filter :retrieve_article, only: [:show, :preview, :edit, :update, :destroy]
     before_filter :retrieve_parents, only: [:new, :edit, :create, :update]
-    before_filter :title_suffix, only: [:new, :edit, :create, :update]
+    before_filter :load_cms_options, only: [:new, :edit, :create, :update]
+    before_filter :seo_cms_authorize, except: [:show]
 
-    layout SeoCms.layout, only: [:show]
+    layout SeoCms.layout, only: [:show, :preview]
 
     # GET /articles
     # GET /articles.json
@@ -21,9 +24,17 @@ module SeoCms
     # GET /articles/1
     # GET /articles/1.json
     def show
-      @article = Article.find(params[:id])
       respond_to do |format|
         format.html # show.html.erb
+        format.json { render json: @article }
+      end
+    end
+
+    # GET /articles/preview/1
+    # GET /articles/preview/1.json
+    def preview
+      respond_to do |format|
+        format.html { render 'show' }
         format.json { render json: @article }
       end
     end
@@ -40,7 +51,7 @@ module SeoCms
 
     # GET /articles/1/edit
     def edit
-      @article = Article.find(params[:id])
+      @parent_url = Hash[@parents.map {|k, v| [v, k]}][@article.parent_id]
     end
 
     # POST /articles
@@ -50,7 +61,7 @@ module SeoCms
 
       respond_to do |format|
         if @article.save
-          format.html { redirect_to articles_path, notice: 'Nouvel article créé.' }
+          format.html { redirect_to [:edit, @article], notice: 'Nouvel article créé.' }
           format.json { render json: @article, status: :created, location: @article }
         else
           format.html { render action: "new" }
@@ -62,11 +73,9 @@ module SeoCms
     # PUT /articles/1
     # PUT /articles/1.json
     def update
-      @article = Article.find(params[:id])
-
       respond_to do |format|
         if @article.update_attributes(params[:article])
-          format.html { redirect_to articles_path, notice: 'Article modifié.' }
+          format.html { redirect_to [:edit, @article], notice: 'Article modifié.' }
           format.json { head :no_content }
         else
           format.html { render action: "edit" }
@@ -78,7 +87,6 @@ module SeoCms
     # DELETE /articles/1
     # DELETE /articles/1.json
     def destroy
-      @article = Article.find(params[:id])
       @article.destroy
 
       respond_to do |format|
@@ -87,18 +95,53 @@ module SeoCms
       end
     end
 
+    def url_availability
+      url = URI(params[:url])
+      message = ''
+      Rails.application.routes.recognize_path(url)
+    rescue URI::InvalidURIError
+      available = false
+      url = params[:url]
+      message = 'url invalide'
+    rescue ArgumentError
+      available = false
+      url = params[:url]
+      message = 'url doit être une string'
+    rescue ActionController::RoutingError
+      available = true
+    else
+      available = false
+      message = 'url déjà utilisée'
+    ensure
+      render json: { url: url.to_s, available: available, message: message }
+    end
+
     private
+
+    def retrieve_article
+      @article = Article.find(params[:id])
+    end
 
     # https://github.com/stefankroes/ancestry/wiki/Creating-a-selectbox-for-a-form-using-ancestry
     def retrieve_parents
-      @parents = Article.all.each { |c| c.ancestry = c.ancestry.to_s + (!c.ancestry.nil? ? '/' : '') + c.id.to_s
-            }.sort { |x, y| x.ancestry <=> y.ancestry
-            }.map { |c| ['-' * (c.depth - 1) + c.url, c.id]
-            }.unshift(['-- none --', nil])
+      @parents_urls = {}
+      @parents_breadcrumbs = {}
+      @parents = Article.all.each do |a|
+        @parents_urls[a.id] = a.url
+        @parents_breadcrumbs[a.id] = generate_breadcrumbs(a.breadcrumbs_info, view_context)
+        a.ancestry = a.ancestry.to_s + (!a.ancestry.nil? ? '/' : '') + a.id.to_s
+      end
+      @parents.sort! { |x, y| x.ancestry <=> y.ancestry }
+      @parents.map! { |a| ['-' * (a.depth - 1) + a.breadcrumb_title, a.id] }
+      @parents.unshift(['-- none --', nil])
     end
 
-    def title_suffix
+    def load_cms_options
+      @layout = SeoCms.layout
+      @orphan_strategy = SeoCms.orphan_strategy
       @title_suffix = SeoCms.title_suffix
+      @reload_routes_on_the_fly = SeoCms.reload_routes_on_the_fly
+      @check_routes_uniqueness = SeoCms.check_routes_uniqueness
     end
   end
 end

@@ -5,6 +5,8 @@ class SeoCmsTest < ActiveSupport::TestCase
     @default_layout = SeoCms.layout
     @default_orphan_strategy = SeoCms.orphan_strategy
     @default_title_suffix = SeoCms.title_suffix
+    @default_reload_routes_on_the_fly = SeoCms.reload_routes_on_the_fly
+    @default_check_routes_uniqueness = SeoCms.check_routes_uniqueness
   end
 
   test 'is a module' do
@@ -53,6 +55,32 @@ class SeoCmsTest < ActiveSupport::TestCase
     SeoCms.title_suffix = 'woot'
     assert_equal(SeoCms.title_suffix, 'woot')
     SeoCms.title_suffix = @default_title_suffix
+  end
+
+  # reload_routes_on_the_fly option
+  test 'has a reload_routes_on_the_fly option' do
+    assert_respond_to(SeoCms, :reload_routes_on_the_fly)
+  end
+  test 'reload_routes_on_the_fly option default to true' do
+    assert_equal(SeoCms.reload_routes_on_the_fly, true)
+  end
+  test 'reload_routes_on_the_fly option can be overwritten' do
+    SeoCms.reload_routes_on_the_fly = false
+    assert_equal(SeoCms.reload_routes_on_the_fly, false)
+    SeoCms.reload_routes_on_the_fly = @default_reload_routes_on_the_fly
+  end
+
+  # check_routes_uniqueness option
+  test 'has a check_routes_uniqueness option' do
+    assert_respond_to(SeoCms, :check_routes_uniqueness)
+  end
+  test 'check_routes_uniqueness option default to true' do
+    assert_equal(SeoCms.check_routes_uniqueness, true)
+  end
+  test 'check_routes_uniqueness option can be overwritten' do
+    SeoCms.check_routes_uniqueness = false
+    assert_equal(SeoCms.check_routes_uniqueness, false)
+    SeoCms.check_routes_uniqueness = @default_check_routes_uniqueness
   end
 
   test 'options can be set all at once' do

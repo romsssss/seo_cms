@@ -1,4 +1,8 @@
-<%= form_for(@article) do |f| %>
+<%
+  form_html = { class: 'seo_article_form' }
+  form_html[:id] = form_id if defined?(form_id)
+%>
+<%= form_for(@article, html: form_html ) do |f| %>
   <% if @article.errors.any? %>
     <div id="error_explanation">
       <h4><%= pluralize(@article.errors.count, "error") %> prohibited this article from being saved:</h4>
@@ -19,45 +23,46 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" id="breadcrumb-form-group">
     <%= f.label :breadcrumb_title %>
-    <%= f.text_field :breadcrumb_title, class: 'form-control' %>
-    <span id="helpBlock" class="help-block">
-      <%= "breadcrumbs actuel: #{generate_breadcrumbs(@article.breadcrumbs_info)}".html_safe %>
-    </span>
+    <%= f.text_field :breadcrumb_title, class: 'form-control', id: 'breadcrumb-input' %>
   </div>
 
-  <div class="form-group">
-    <%= f.label :uri %>
-    <%= f.text_field :uri, class: 'form-control' %>
-    <span id="helpBlock" class="help-block">
-      <%= "url actuelle: #{@article.url}".html_safe %>
-    </span>
+  <div class="form-group" id="uri-form-group">
+    <%= f.label :uri, 'Last URL path' %>
+    <%= f.text_field :uri, class: 'form-control', id: 'uri-input' %>
   </div>
-
-  <div class="form-group">
+  <div class="form-group" id="parent-url">
    <%= f.label :parent %>
-   <%= f.select :parent_id, @parents, {}, { class: 'form-control' } %>
-  </div>
-
-<!--   <div class="form-group">
-    <%= f.label :is_placeholder %><br />
-    <%= f.check_box :is_placeholder %>
-  </div> -->
-
-  <div class="form-group" id="metadata-form-group">
-    <%= f.label :metadata, 'Decription metadata', class: 'control-label' %>
-    <%= f.text_area :metadata, rows: 3, class: 'form-control', id: "metadata-input" %>
+   <input id="typeahead_visible_feild" class="typeahead" type="text" value="<%= @article.parent_id ? @parent_url : "" %>"></input>
+   <%= f.text_field :parent_id, class: 'typeahead_id', style: 'visibility: hidden;' %>
   </div>
 
   <div class="form-group">
+   <%= f.label :is_placeholder, "Contenu dynamique présent sur cette page" %>
+   <%= f.check_box :is_placeholder, id: "is-placeholder-input" %>
+   <p class="help-block">“On peut dire qu’il s’agit d’une page à contenu dynamique quand des listings de mentors sont présents sur la page. Donc s’il s’agit d’une page pleinement statique, merci de décocher cette case."<br><br></p><p style="color:red;">Si vous êtes en mode Édition d’un article, il n’y aucune raison apparente de changer la configuration déjà en place.</p>
+   <p>Besoin d'aide? https://quip.com/n7ezAaoZm2ZH </p>
+  </div>
+
+  <div class="form-group content_field" id="metadata-form-group">
+    <%= f.label :metadata, 'Decription metadata', class: 'control-label' %>
+    <%= f.text_area :metadata, rows: 2, class: 'form-control', id: "metadata-input" %>
+  </div>
+
+  <div class="form-group content_field">
     <%= f.label :content %>
     <%= f.text_area :content, id: "seo_article_content" %>
+    <span class="content-field-counter"><span class="word-count">0</span> mots</span>
   </div>
 
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+  <%= f.hidden_field :is_draft %>
+
+  <% unless defined?(show_submit_button) && !show_submit_button %>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
 <% end %>
 
 <script type="text/javascript">
@@ -66,56 +71,242 @@ $(function() {
   <% unless @title_suffix.nil? %>
     var title_suffix = '<%= @title_suffix %>';
   <% end %>
-
+  var parents_urls = <%= @parents_urls.to_json.html_safe %>,
+      parents_breadcrumbs = <%= @parents_breadcrumbs.to_json.html_safe %>,
+      check_routes_uniqueness = <%= @check_routes_uniqueness %>,
+      original_url = '<%= @article.url %>';
   // redactor
-  launch_redactor();
+  launch_redactor($('#seo_article_content'));
 
-  // Lengths validations
-  check_title_length();
-  check_metadata_length();
-  $("#title-input").keyup(check_title_length);
-  $("#metadata-input").keyup(check_metadata_length);
+  // Form live information display
+  display_title_length();
+  display_breadcrumbs();
+  display_url();
+  display_metadata_length();
+  display_content_word_count();
+  $("#title-input").keyup(display_title_length);
+  $("#breadcrumb-input").keyup(display_breadcrumbs);
+  $("#uri-input").keyup(display_url);
+  $("#uri-input").change(check_url_availability);
+  $("#metadata-input").keyup(display_metadata_length);
+  $('.redactor-editor').keyup(display_content_word_count);
+  $("#article_parent_id").change(display_url);
+  $("#article_parent_id").change(display_breadcrumbs);
+  $("#article_parent_id").change(check_url_availability);
+  $('a, button').click(remove_warning_if_unnecessary);
 
+  listen_to_form_changes();
 
-  function launch_redactor() {
-    $('#seo_article_content').redactor({
-      plugins: ['table', 'video']
+  function check_url_availability() {
+    var current_url = get_current_url_as_string(),
+        uri_group_form = $('#uri-form-group'),
+        spinner = '<div class="spinner">\
+                    <div class="double-bounce1"></div>\
+                    <div class="double-bounce2"></div>\
+                  </div>';
+
+    if (original_url === current_url) { // No need to check availability
+      display_tooltip(uri_group_form, '', '');
+      display_url();
+      return;
+    }
+
+    // display spinner
+    display_tooltip(uri_group_form, '', spinner, true);
+
+    $.get("/seo_content/url_availability", { url: get_current_url_as_string() }, function (response) {
+      var tooltip_type = '',
+          tooltipe_content = '';
+      if(response.available) {
+        tooltip_type = 'has-success';
+        tooltip_content = '-> disponible';
+      } else {
+        if (response.message === 'url déjà utilisée') {
+            tooltip_content = '-> déjà utilisée';
+            tooltip_type = (check_routes_uniqueness) ? 'has-error' : 'has-warning';
+        } else {
+          tooltip_type = 'has-error';
+          tooltip_content = '-> invalide';
+        }
+      }
+      display_tooltip(uri_group_form, tooltip_type, '<i>' + tooltip_content + '</i>', true);
     });
   }
 
-  function check_title_length() {
-    var title_content = $("#title-input").val();
+  window.addEventListener("beforeunload", warn_if_changes);
+
+  function remove_warning_if_unnecessary() {
+    var object_id = $(this).attr('id'),
+        ignored_ids = ['edit_article_submit', 'create_article_submit'];
+
+    if (typeof object_id !== 'undefined' && ignored_ids.includes(object_id)) {
+      window.removeEventListener('beforeunload', warn_if_changes);
+    }
+  }
+
+  // Run selector for a given selector (textarea expected)
+  function launch_redactor(selector) {
+    selector.redactor({
+      plugins: ['table', 'video', 'fullscreen']
+    });
+  }
+
+  function get_current_url_as_string() {
+    var parent_url = parents_urls[$('.typeahead_id').val()],
+        current_url = '/' +  $("#uri-input").val();
+    if (typeof parent_url !== 'undefined') {
+      current_url = parent_url + current_url;
+    }
+    return current_url;
+  }
+
+  function get_current_breadcrumbs_as_string() {
+    var parent_breadcrumbs = parents_breadcrumbs[$('#article_parent_id').find(":selected").val()],
+        current_breadcrumbs = '<b>' + $("#breadcrumb-input").val() + '</b>';
+
+    if (typeof parent_breadcrumbs !== 'undefined') {
+      current_breadcrumbs = parent_breadcrumbs + ' > ' + current_breadcrumbs;
+    }
+    return current_breadcrumbs;
+  }
+
+  function get_help_block_from_group(form_group) {
+    var help_block = form_group.find('span.help-block');
+    if(!help_block.length) {
+      form_group.append("<span class='help-block'></span>");
+      help_block = form_group.find('span.help-block');
+    }
+    return help_block;
+  }
+
+  function display_url() {
+    var help_block = get_help_block_from_group($('#uri-form-group')),
+        url = get_current_url_as_string().split('/');
+    url[url.length-1] = '<b>' + url[url.length-1] + '</b>';
+    help_block.html("url : " + url.join('/'));
+  }
+
+  function display_breadcrumbs() {
+    var help_block = get_help_block_from_group($('#breadcrumb-form-group')),
+        breadcrumbs = get_current_breadcrumbs_as_string();
+    help_block.html("breadcrumbs : " + breadcrumbs);
+  }
+
+  function display_title_length() {
+    var title_form_group = $("#title-form-group"),
+        title_input = $("#title-input"),
+        content_length;
+
     if (typeof title_suffix !== 'undefined') {
-      title_content = title_content.concat(' | ').concat(title_suffix);
-    }
-    if(title_content.length > 65) {
-      addWarningMessage($("#title-form-group"), "Un titre de plus de 65 caractères peut être cropé par les moteurs de recherche.");
+      content_length = (title_input.val().concat(' | ').concat(title_suffix)).length;
     } else {
-      removeWarningMessage($("#title-form-group"));
+      content_length = title_input.val().length;
     }
-  }
-
-  function check_metadata_length() {
-    var metadata_content = $("#metadata-input").val();
-    if(metadata_content.length > 156) {
-      addWarningMessage($("#metadata-form-group"), "Une description metadata de plus de 156 caractères peut être cropé par les moteurs de recherche.");
+    if(content_length > 65) {
+      display_tooltip(title_form_group, 'has-warning', content_length + ' caractères (Un titre de plus de 65 caractères peut être cropé par les moteurs de recherche)')
     } else {
-      removeWarningMessage($("#metadata-form-group"));
+      display_tooltip(title_form_group, 'has-success', content_length + ' caractères')
     }
   }
 
-  function addWarningMessage(element, text) {
-    if (!element.hasClass('has-warning')) {
-      element.addClass('has-warning');
-      element.append("<span class='help-block'>" + text +  "</span>");
+  function display_metadata_length() {
+    var metadata_form_group = $("#metadata-form-group"),
+        metadata_input = $("#metadata-input"),
+        content_length = metadata_input.val().length;
+
+    if(content_length > 156) {
+      display_tooltip(metadata_form_group, 'has-warning', content_length + ' caractères (Une description metadata de plus de 156 caractères peut être cropé par les moteurs de recherche)')
+    } else {
+      display_tooltip(metadata_form_group, 'has-success', content_length + ' caractères')
     }
   }
 
-  function removeWarningMessage(element) {
-    element.removeClass('has-warning');
-    element.find('.help-block').remove();
+  function display_tooltip(form_group, type, content, append) {
+    var available_types = ['has-success', 'has-warning', 'has-error', ''],
+        help_block = get_help_block_from_group(form_group),
+        spinner = form_group.find('.spinner');
+
+    append = (typeof append !== 'undefined') ? append : false;
+    if (!available_types.includes(type)) { throw "Unkown type: " + type; }
+
+    // Remove spinners if present
+    $.map(form_group.find('.spinner'), function(spinner) { spinner.remove(); });
+
+    form_group.removeClass(available_types.join(' '));
+    form_group.addClass(type);
+
+    if (append) {
+      help_block.append(content);
+    } else {
+      help_block.html(content);
+    }
   }
 
+  function listen_to_form_changes() {
+    $(".seo_article_form :input").change(function() {
+       $('.seo_article_form').data("changed",true);
+    });
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload
+  function warn_if_changes(closing_event) {
+    if (!$(".seo_article_form").data("changed")) { return true; }
+
+    var confirmationMessage = "Your changes will be lost if you don't save them.";
+
+    (closing_event || window.event).returnValue = confirmationMessage;  //Gecko + IE
+    return confirmationMessage;                                         //Webkit, Safari, Chrom
+  }
+
+  function display_content_word_count() {
+
+    var value = $($('#seo_article_content').val()).text();
+    var wordCount = 0;
+
+    value = value.replace(/<\/(.*?)>/gi, ' ');
+    value = value.replace(/<(.*?)>/gi, '');
+    value = value.replace(/\t/gi, '');
+    value = value.replace(/\n/gi, ' ');
+    value = value.replace(/\r/gi, ' ');
+    value = value.replace(/\u200B/g, '');
+    value = value.replace(/ +(?= )/g,'');
+
+    wordCount = value.trim().split(' ').length;
+
+    if (wordCount < 800) {
+      $('.content-field-counter').css('color', 'red');
+      if (value.length == 0) {
+        $('.word-count').html(0);
+        return;
+      }
+    }
+    else {
+      $('.content-field-counter').css('color', 'green');
+    }
+
+    $('.word-count').html(wordCount);
+  }
+
+  var parents = <%= raw @parents.map{ |p| p.first }.to_json %>;
+  var parentsId = <%= raw @parents.map{ |p| p[1] }.to_json %>;
+  $('input.typeahead').typeahead({
+    minLength: 1,
+    source: parents,
+    items: '20',
+    matcher: function(item) {
+      function transliterate(s) {
+        return s.replace(/[éèëê]/g, 'e').replace(/[ï]/g, 'i')
+      }
+      return ~transliterate(item.toLowerCase()).indexOf(transliterate(this.query.toLowerCase()))
+    },
+    updater: function(name) {
+      var id = parentsId[parents.indexOf(name)];
+      $('.typeahead_id').val(id);
+      display_url();
+      return name
+    }
+  })
 });
+
 </script>
 
